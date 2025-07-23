@@ -1,0 +1,49 @@
+# Example terraform.tfvars file
+# Copy this file to terraform.tfvars and fill in your specific values
+
+# Required: AWS region for deployment
+aws_region = "us-east-1"
+
+# Optional: Environment name (for tagging)
+environment = "dev"
+
+# Optional: Who created these resources (for tagging)
+created_by = "your-name-or-team"
+
+# Required: AWS Key Pair name for SSH access
+key_name = "your-aws-key-pair-name"
+
+# Required: HCP Boundary cluster address
+boundary_hcp_cluster_id = "<uuid>"
+
+# Required: Controller-generated activation token for Boundary worker
+# Generate this token in HCP Boundary console before running terraform
+controller_generated_activation_token = "your-controller-generated-activation-token"
+
+# Optional: Use existing VPC (leave empty to create new VPC)
+# vpc_id = "vpc-1234567890abcdef0"
+
+# Optional: Customize instance types (defaults are fine for testing)
+# boundary_worker_instance_type = "t3.small"
+# cassandra_instance_type = "t3.small"
+
+# Optional: Specify Boundary Enterprise version (defaults to 0.19.3)
+# boundary_version = "0.19.3"
+
+# Optional: Customize networking (defaults should work)
+# availability_zone = "us-east-1a"
+# vpc_cidr = "10.0.0.0/16"  # Only used if creating new VPC
+# public_subnet_cidr = "10.0.1.0/24"
+# private_subnet_cidr = "10.0.2.0/24"
+
+# Optional: SSH access to Boundary worker instances
+# If not specified or empty, no SSH access will be allowed (recommended for security)
+# ssh_allowed_cidrs = ["192.168.1.0/24", "10.0.0.0/8"]  # Example: restrict to specific networks
+# ssh_allowed_cidrs = ["YOUR.IP.ADDRESS/32"]              # Example: restrict to your IP only
+
+# Optional: Customize Cassandra cluster name
+# cassandra_cluster_name = "Ryan EC2 Cluster"
+
+# Optional: Enable SSH access to Cassandra from Boundary worker network only
+# Useful for internal troubleshooting while maintaining security
+# enable_internal_ssh = false

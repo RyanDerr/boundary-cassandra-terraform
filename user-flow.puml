@@ -1,0 +1,48 @@
+@startuml HCP_Boundary_to_Cassandra_User_Flow
+
+!theme aws-orange
+title HCP Boundary to Cassandra Authentication Flow with Brokered Credentials
+
+actor "User" as user
+participant "HCP Boundary\nController" as hcp
+participant "Credential Store\n(Vault/Static)" as vault
+box "AWS VPC" #LightBlue
+    participant "Boundary Worker\n(EC2 Public Subnet)" as worker
+    participant "Cassandra DB\n(EC2 Private Subnet)" as cassandra
+end box
+
+== Session Initiation ==
+user -> hcp: boundary connect cassandra -target-id <target-id>
+hcp -> hcp: Authorize user access\nto target
+
+== Credential Brokering ==
+hcp -> vault: Request Cassandra credentials
+vault -> hcp: Return username/password
+note right: HCP Boundary retrieves\ntemporary or static credentials\nfor Cassandra access
+
+== Session Establishment ==
+hcp -> worker: Establish session with\nbrokered credentials
+worker -> cassandra: Test connectivity (port 9042)
+cassandra -> worker: Connection confirmed
+worker -> hcp: Session ready
+hcp -> user: Return proxy details\n(local port, session info)
+
+== User Connection ==
+user -> worker: Connect via localhost proxy
+worker -> cassandra: Forward CQL with brokered credentials
+
+== Active Session ==
+loop CQL Session
+    user -> worker: CQL commands
+    worker -> cassandra: Execute queries
+    cassandra -> worker: Results
+    worker -> user: Return results
+end
+
+== Session Cleanup ==
+user -> hcp: Exit or timeout
+hcp -> worker: Terminate session
+worker -> cassandra: Close connections
+hcp -> vault: Revoke credentials (if dynamic)
+
+@enduml
